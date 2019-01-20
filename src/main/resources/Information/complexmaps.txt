@@ -1,0 +1,9 @@
+bigmap.txt
+map1.txt
+slugmaze.txt
+somanyskeletons.txt
+testmap.txt
+timing.txt
+smap1.txt
+sprint.txt
+easymaze.txt
