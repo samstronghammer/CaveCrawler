@@ -5,6 +5,8 @@ import com.oliphantsb.cavecrawler.clientgame.enums.VisibilitySetting;
 import com.oliphantsb.cavecrawler.clientgame.game.MapParser;
 import com.oliphantsb.cavecrawler.clientgame.game.Game;
 import com.oliphantsb.cavecrawler.clientgame.game.GraphicalGame;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,59 +20,20 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 public class Main {
 
     public static void main(String[] args) throws IOException {
-        //TODO use real argument parser
-        boolean complex = false;
-        boolean text = false;
-        boolean hard = false;
-        boolean fail = false;
-
-
-
-        for (String a : args) {
-            switch (a) {
-                case "-complex":
-                    if (complex) {
-                        fail = true;
-                    } else {
-                        complex = true;
-                    }
-                    break;
-                case "-hard":
-                    if (hard) {
-                        fail = true;
-                    } else {
-                        hard = true;
-                    }
-                    break;
-                case "-text":
-                    if (text) {
-                        fail = true;
-                    } else {
-                        text = true;
-                    }
-                    break;
-                default:
-                    fail = true;
-                    break;
-            }
-            if (fail) {
-                break;
-            }
-        }
-        if (fail) {
-            Util.println("Uh oh! Those arguments weren't valid. There are only three possible flags: -complex, -hard, and -text.");
+        OptionParser parser = new OptionParser();
+        parser.accepts("complex");
+        parser.accepts("text");
+        parser.accepts("hard");
+        OptionSet options = parser.parse(args);
+        List<String> maps =
+                MapParser.getStringOnEachLine(options.has("complex") ? "complexmaps.txt" : "simplemaps.txt", ResourceType.INFORMATION);
+        VisibilitySetting visibility = options.has("hard") ? VisibilitySetting.HARD : VisibilitySetting.EASY;
+        if (options.has("text")) {
+            runText(visibility, maps);
         } else {
-            List<String> maps = complex ?
-                    MapParser.getStringOnEachLine("complexmaps.txt", ResourceType.INFORMATION) :
-                    MapParser.getStringOnEachLine("simplemaps.txt", ResourceType.INFORMATION);
-            VisibilitySetting visibility = hard ? VisibilitySetting.HARD : VisibilitySetting.EASY;
-            if (text) {
-                runText(visibility, maps);
-            } else {
-                runGraphical(visibility, maps);
-            }
-            Util.println("Exited successfully.");
+            runGraphical(visibility, maps);
         }
+        Util.println("Exited successfully.");
     }
 
     private static void runGraphical(VisibilitySetting visibility, List<String> boardfiles) throws IOException {
